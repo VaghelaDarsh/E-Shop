@@ -111,7 +111,7 @@ export default function OrderDetailsScreen(props) {
                                         <div className="row">
                                             <div>
                                                 <img 
-                                                    src={'.'+item.image} 
+                                                    src={'..'+item.image} 
                                                     alt={item.name} 
                                                     className="small"></img>
                                             </div>
