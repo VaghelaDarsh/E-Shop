@@ -8,6 +8,16 @@ import { generateToken, isAdmin, isAuth } from '../utils.js';
 const userRouter = express.Router();
 
 userRouter.get(
+  '/top-sellers',
+  expressAsyncHandler(async (req, res) => {
+    const topSellers = await User.find({ isSeller: true })
+      .sort({ 'seller.rating': -1 })
+      .limit(3);
+    res.send(topSellers);
+  })
+);
+
+userRouter.get(
   '/send',
   expressAsyncHandler(async (req, res) => {
     // await User.remove({});
@@ -26,6 +36,7 @@ userRouter.post('/signin',expressAsyncHandler(async(req,res)=>{
                 email:user.email,
                 isAdmin:user.isAdmin,
                 token:generateToken(user),
+                isSeller:user.isSeller
             });
             return;
         }
@@ -45,6 +56,7 @@ userRouter.post('/register',expressAsyncHandler(async(req,res)=> {
     _id:createdUser._id,
     name:createdUser.name,
     email:createdUser.email,
+    isSeller:user.isSeller,
     isAdmin:createdUser.isAdmin,
     token:generateToken(createdUser),
 })
@@ -67,6 +79,12 @@ userRouter.put('/update',isAuth,expressAsyncHandler(async(req,res)=> {
     user.name = req.body.name || user.name;
     user.email = req.body.email || user.email;
 
+    if(user.isSeller){
+      user.seller.name = req.body.sellerName || user.seller.name;
+      user.seller.logo = req.body.sellerLogo || user.seller.logo;
+      user.seller.description = req.body.sellerDescription || user.seller.description;
+    }
+
     if(req.body.password) {
       user.password = bcrypt.hashSync(req.body.password,8);
 
@@ -77,6 +95,7 @@ userRouter.put('/update',isAuth,expressAsyncHandler(async(req,res)=> {
     _id:UpdatedUser._id,
     name:UpdatedUser.name,
     email:UpdatedUser.email,
+    isSeller:user.isSeller,
     isAdmin:UpdatedUser.isAdmin,
     token:generateToken(UpdatedUser),
 })
