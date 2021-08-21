@@ -1,11 +1,11 @@
 import axios from "axios"
-import { USER_DETAILS_REQUEST, 
+import { USER_DELETE_FAIL, USER_DELETE_REQUEST, USER_DELETE_SUCCESS, USER_DETAILS_REQUEST, 
     USER_DETAILS_SUCCESS, 
     USER_LIST_FAIL, 
     USER_LIST_REQUEST, 
     USER_LIST_SUCCESS, 
     USER_REGISTER_FAIL, USER_REGISTER_REQUEST, USER_REGISTER_SUCCESS, 
-    USER_SIGNIN_FAIL, USER_SIGNIN_REQUEST, USER_SIGNIN_SUCCESS, USER_SIGNOUT, USER_UPDATE_FAIL, USER_UPDATE_REQUEST, USER_UPDATE_SUCCESS } from "../constants/userConstants"
+    USER_SIGNIN_FAIL, USER_SIGNIN_REQUEST, USER_SIGNIN_SUCCESS, USER_SIGNOUT, USER_UPDATE_BYADMIN_FAIL, USER_UPDATE_BYADMIN_REQUEST, USER_UPDATE_BYADMIN_SUCCESS, USER_UPDATE_FAIL, USER_UPDATE_REQUEST, USER_UPDATE_SUCCESS } from "../constants/userConstants"
 
 export const signin = (email,password) => async (dispatch) => {
     dispatch({type: USER_SIGNIN_REQUEST, payload: {email,password}})
@@ -143,3 +143,55 @@ export const listusers = () => async (dispatch,getState) => {
         })
     }
 }
+
+export const deleteUser = (userId) => async (dispatch,getState) =>{
+    dispatch({
+        type:USER_DELETE_REQUEST,payload:userId
+    });
+
+    const {userSignin:{userInfo}} = getState();
+
+    try{
+        const {data} = await axios.delete(`/api/users/${userId}`,{
+            headers:{
+                authorization:`Bearer ${userInfo.token}`,
+            },
+        })
+        dispatch({type:USER_DELETE_SUCCESS,payload:data})
+    }
+    catch(err){
+        dispatch({type:USER_DELETE_FAIL,
+            payload:
+            err.response && err.response.data.message 
+            ? err.response.data.message
+            : err.message, 
+        });
+    }
+}
+
+export const updateUserByAdmin = (user) => async (dispatch,getState) => {
+    dispatch({type: USER_UPDATE_BYADMIN_REQUEST, payload: user})
+    const {userSignin:{userInfo}} = getState();
+    
+    try{
+
+        const {data} = await axios.put(`/api/users/${user._id}`,user,{
+            headers:{ Authorization: `Bearer ${userInfo.token}`},
+        });
+
+        dispatch({
+            type:USER_UPDATE_BYADMIN_SUCCESS,
+            payload:data
+        });
+
+    }
+    catch(err){
+        dispatch({
+            type:USER_UPDATE_BYADMIN_FAIL,
+            payload:
+            err.response && err.response.data.message 
+            ? err.response.data.message
+            : err.message, 
+        })
+    }
+};

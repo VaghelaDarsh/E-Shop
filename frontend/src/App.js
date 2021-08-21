@@ -19,6 +19,7 @@ import ProductListScreen from './Screens/ProductListScreen';
 import ProductEditScreen from './Screens/ProductEditScreen';
 import OrderListScreen from './Screens/OrderListScreen';
 import UserListScreen from './Screens/UserListScreen';
+import UserEditSceen from './Screens/UserEditSceen';
 
 function App() {
 
@@ -93,6 +94,7 @@ function App() {
           <AdminRoute path="/productlist" component={ProductListScreen}></AdminRoute>
           <AdminRoute path="/orderlist" component={OrderListScreen}></AdminRoute>
           <AdminRoute path="/userlist" component={UserListScreen}></AdminRoute>
+          <AdminRoute path="/user/:id/edit" component={UserEditSceen}></AdminRoute>
         </main>
         <footer className="row center">All right reserved</footer>
     </div>

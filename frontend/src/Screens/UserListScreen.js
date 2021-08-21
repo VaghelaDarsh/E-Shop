@@ -1,23 +1,40 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { listusers } from '../actions/userActions'
+import { deleteUser, listusers } from '../actions/userActions'
 import LoadingBox from '../components/LoadingBox'
 import MessageBox from '../components/MessageBox'
+import { USER_DELETE_RESET, USER_DETAILS_RESET } from '../constants/userConstants'
 
-export default function UserListScreen() {
+export default function UserListScreen(props) {
 
     const userList = useSelector(state => state.userList);
     const {loading,error,users} = userList;
+
+    const userDelete = useSelector(state => state.userDelete);
+    const {loading:loadingDelete,error:errorDelete,success:successDelete} = userDelete;
 
     const dispatch = useDispatch()
 
     useEffect(() => {
         dispatch(listusers());
-    },[dispatch])
+        dispatch({type:USER_DETAILS_RESET})
+    },[dispatch,successDelete]);
+
+    const deleteUserHandler = (user) => {
+        if(window.confirm('Are you sure?')){
+            dispatch(deleteUser(user._id));
+        }
+    }
 
     return (
         <div>
             <hq>User</hq>
+
+            {loadingDelete && <LoadingBox></LoadingBox>}
+            {errorDelete && <MessageBox variant="danger">{errorDelete}</MessageBox>}
+            {successDelete && <MessageBox variant="success">User Deleted</MessageBox>}
+
+
             {
                 loading? (<LoadingBox></LoadingBox>)
                 :error? (<MessageBox variant="danger">{error}</MessageBox>)
@@ -45,13 +62,14 @@ export default function UserListScreen() {
                                         <button 
                                             type="button" 
                                             className="small"
-                                            >Details
+                                            onClick={() => props.history.push(`/user/${user._id}/edit`)}
+                                            >Edit
                                         </button>
 
                                         <button 
                                             type="button" 
                                             className="small"
-                                            >Delete
+                                            onClick={() => deleteUserHandler(user)}>Delete
                                         </button>
 
                                         </td>
