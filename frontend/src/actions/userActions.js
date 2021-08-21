@@ -1,6 +1,9 @@
 import axios from "axios"
 import { USER_DETAILS_REQUEST, 
     USER_DETAILS_SUCCESS, 
+    USER_LIST_FAIL, 
+    USER_LIST_REQUEST, 
+    USER_LIST_SUCCESS, 
     USER_REGISTER_FAIL, USER_REGISTER_REQUEST, USER_REGISTER_SUCCESS, 
     USER_SIGNIN_FAIL, USER_SIGNIN_REQUEST, USER_SIGNIN_SUCCESS, USER_SIGNOUT, USER_UPDATE_FAIL, USER_UPDATE_REQUEST, USER_UPDATE_SUCCESS } from "../constants/userConstants"
 
@@ -118,3 +121,25 @@ export const updateUserProfile = (user) => async (dispatch,getState) => {
         })
     }
 };
+
+export const listusers = () => async (dispatch,getState) => {
+    dispatch({type:USER_LIST_REQUEST});
+    const {userSignin:{userInfo}} = getState();
+    
+    try{
+        const {data} = await axios.get(`/api/users`,{
+            headers:{
+                authorization:`Bearer ${userInfo.token}`,
+            },
+        });
+        dispatch({type:USER_LIST_SUCCESS,payload:data});
+    }
+    catch(err){
+        dispatch({type:USER_LIST_FAIL,
+        payload:
+            err.response && err.response.data.message
+                ? err.response.data.message
+                : err.message,
+        })
+    }
+}

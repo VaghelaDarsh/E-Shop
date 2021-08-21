@@ -3,7 +3,7 @@ import expressAsyncHandler from 'express-async-handler';
 import data from '../data.js';
 import User from '../models/userModal.js';
 import bcrypt from 'bcryptjs';
-import { generateToken, isAuth } from '../utils.js';
+import { generateToken, isAdmin, isAuth } from '../utils.js';
 
 const userRouter = express.Router();
 
@@ -81,5 +81,10 @@ userRouter.put('/update',isAuth,expressAsyncHandler(async(req,res)=> {
     token:generateToken(UpdatedUser),
 })
 }));
+
+userRouter.get('/',isAuth,isAdmin,expressAsyncHandler(async(req,res)=>{
+  const users = await User.find({});
+  res.send(users);
+}))
 
 export default userRouter;
